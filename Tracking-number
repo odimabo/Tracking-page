@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Sendungsverfolgung</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      color: #0056b3;
+    }
+    .tracking-link {
+      display: block;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2em;
+      text-decoration: none;
+      color: #0056b3;
+      cursor: pointer;
+    }
+    .tracking-link:hover {
+      text-decoration: underline;
+    }
+    .loader {
+      text-align: center;
+      margin-top: 20px;
+      font-style: italic;
+    }
+    .details, .timeline {
+      margin-top: 20px;
+    }
+    .details p {
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+    .timeline h3 {
+      color: #0056b3;
+    }
+    .timeline ul {
+      list-style: none;
+      padding: 0;
+    }
+    .timeline li {
+      padding: 10px 0;
+      border-left: 2px solid #0056b3;
+      margin-left: 20px;
+      position: relative;
+    }
+    .timeline li::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      background: #0056b3;
+      border-radius: 50%;
+      position: absolute;
+      left: -7px;
+      top: 10px;
+    }
+  </style>
+  <script>
+    // Diese Funktion simuliert einen API-Aufruf, um Sendungsverfolgungsdaten abzurufen
+    function ladeSendungsdaten() {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          // Simulierte API-Antwort
+          const sendungsdaten = {
+            trackingNummer: 'DE-HAMB-9876543210',
+            aktuellerStatus: 'In Transit',
+            aktuellerStandort: 'Hamburg, Deutschland',
+            letzteAktualisierung: new Date().toLocaleString('de-DE'),
+            voraussichtlicheLieferung: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('de-DE'),
+            verlauf: [
+              { zeit: '2025-04-03 09:00', ereignis: 'Abholung beim Versender.' },
+              { zeit: '2025-04-04 14:30', ereignis: 'Ankunft im Sortierzentrum Hamburg.' },
+              { zeit: '2025-04-05 08:15', ereignis: 'Abfahrt aus dem Hamburger Zentrum.' },
+              { zeit: '2025-04-06 13:45', ereignis: 'Unterwegs zum Bestimmungsort.' }
+            ]
+          };
+          resolve(sendungsdaten);
+        }, 1500); // Verzögerung von 1,5 Sekunden
+      });
+    }
+
+    // Diese Funktion zeigt die Sendungsverfolgungsdetails an
+    async function zeigeSendungsverfolgung() {
+      const detailsContainer = document.getElementById('sendungsverfolgungDetails');
+      detailsContainer.innerHTML = '<div class="loader">Lade Sendungsverfolgungsdetails...</div>';
+      
+      try {
+        const daten = await ladeSendungsdaten();
+        let verlaufHTML = '';
+        daten.verlauf.forEach(item => {
+          verlaufHTML += `<li><strong>${item.zeit}:</strong> ${item.ereignis}</li>`;
+        });
+
+        detailsContainer.innerHTML = `
+          <div class="details">
+            <p><strong>Sendungsnummer:</strong> ${daten.trackingNummer}</p>
+            <p><strong>Status:</strong> ${daten.aktuellerStatus}</p>
+            <p><strong>Aktueller Standort:</strong> ${daten.aktuellerStandort}</p>
+            <p><strong>Letzte Aktualisierung:</strong> ${daten.letzteAktualisierung}</p>
+            <p><strong>Voraussichtliche Lieferung:</strong> ${daten.voraussichtlicheLieferung}</p>
+          </div>
+          <div class="timeline">
+            <h3>Sendungsverlauf</h3>
+            <ul>${verlaufHTML}</ul>
+          </div>
+        `;
+      } catch (error) {
+        detailsContainer.innerHTML = '<p>Fehler beim Laden der Sendungsdetails. Bitte versuchen Sie es später erneut.</p>';
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Sendungsverfolgung</h1>
+    <p style="text-align:center;">Klicken Sie auf die Sendungsnummer, um den aktuellen Status Ihrer Lieferung einzusehen.</p>
+    <!-- Sendungsnummer Link -->
+    <a class="tracking-link" href="javascript:void(0);" onclick="zeigeSendungsverfolgung()">DE-HAMB-9876543210</a>
+    
+    <!-- Container, in dem die Sendungsverfolgungsdetails angezeigt werden -->
+    <div id="sendungsverfolgungDetails"></div>
+  </div>
+</body>
+</html>
